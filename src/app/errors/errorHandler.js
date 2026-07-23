@@ -5,6 +5,6 @@ export default function errorHandler(err, res, req, next) {
         return res.status(500).json({ error: "DataAccessError" });
     }
     
-    console.err(err);
+    console.error(err);
     return res.status(500).json({ error: "Internal Server Error" });
 }
