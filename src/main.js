@@ -1,7 +1,7 @@
 import express from 'express';
 import shortenerRouter from './app/routes/shortener.route.js';
 import errorHandler from './app/errors/errorHandler.js'
-
+import client from './app/clients/redis.client.js';
 const app = express();
 export const PORT = 3000;
 
@@ -15,6 +15,16 @@ app.get('/', (req, res) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, function(){
-    console.log(`Listening on http://127.0.0.1:${PORT}`);
-})
+async function start(){
+    await client.connect();
+    app.listen(PORT, function(){
+        console.log(`Listening on http://127.0.0.1:${PORT}`);
+    })
+}
+
+start();
+
+process.on("SIGTERM", async () => {
+    await client.quit();
+    process.exit(0);
+});
