@@ -1,7 +1,6 @@
 import { shortenUrl, decodeUrl } from '../services/shortener.service.js';
 import client from '../clients/redis.client.js';
 import DataAccessError from '../errors/DataAccessError.js';
-import { setTimeout } from 'timers/promises';
 
 export const getOriginal = async (req, res) => {
     const code = req.params.code;
@@ -9,7 +8,6 @@ export const getOriginal = async (req, res) => {
     let originalUrl = await client.get(code);
     if (originalUrl) return res.redirect(originalUrl);
 
-    await setTimeout(3000);
     try{
         originalUrl = await decodeUrl(code);
         if (!originalUrl) 
