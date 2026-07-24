@@ -1,4 +1,4 @@
-import DataAccessError from "./DataAccessError.js";
+import DataAccessError from "../errors/DataAccessError.js";
 export default function errorHandler(err, req, res, next) {
     if (err instanceof DataAccessError) {
         console.error(err.cause ?? err);
