@@ -25,11 +25,11 @@ export function decodeToInt(code) {
   return num;
 }
 
-export async function shortenUrl(originalUrl) {
+export async function shortenUrl(originalUrl, userId) {
   //insert url to db, convert its id in db to base62
   //return shortened url
   if (URL.canParse(originalUrl)) {
-    const shortenedUrl = await saveUrl(originalUrl);
+    const shortenedUrl = await saveUrl(originalUrl, userId);
     const code = convertToBase62(shortenedUrl.id);
     return code;
   }
@@ -41,9 +41,9 @@ export async function decodeUrl(code) {
   //decode base62 to int
   //return original url
   const urlId = decodeToInt(code);
-  const shortenedUrl = await readUrl(urlId);
+  const shortUrl = await readUrl(urlId);
 
-  if (!shortenedUrl) return null;
+  if (!shortUrl) return null;
 
-  return shortenedUrl.originalUrl;
+  return shortUrl.originalUrl;
 }

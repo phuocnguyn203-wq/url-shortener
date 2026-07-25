@@ -1,11 +1,11 @@
 import { shortenUrl, decodeUrl } from "../services/shortener.service.js";
-import client from "../clients/redis.client.js";
+import redisClient from "../clients/redis.client.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export const getOriginal = async (req, res) => {
   const code = req.params.code;
 
-  let originalUrl = await client.get(code);
+  let originalUrl = await redisClient.get(code);
   if (originalUrl) return res.redirect(originalUrl);
 
   try {
@@ -25,14 +25,15 @@ export const getOriginal = async (req, res) => {
 
 export const create = async (req, res) => {
   const { originalUrl } = req.body;
+  const userId = req.userId;
 
   if (!originalUrl) return res.status(400).json({ error: "URL is required " });
   try {
-    const code = await shortenUrl(originalUrl);
+    const code = await shortenUrl(originalUrl, userId);
     if (code === null) return res.status(400).json({ error: "Invalid URL" });
 
-    const shortenedUrl = `${req.protocol}://${req.get("host")}/shortened/${code}`;
-    return res.json({ shortenedUrl });
+    const shortUrl = `${req.protocol}://${req.get("host")}/shortened/${code}`;
+    return res.json({ shortUrl });
   } catch (error) {
     if (error instanceof DataAccessError) {
       console.log(error.cause);
