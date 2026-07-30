@@ -6,9 +6,14 @@ export const getOriginal = async (req, res) => {
 
   try {
     const originalUrl = await decodeUrl(code);
-    if (!originalUrl) return res.status(400).json({ error: "URL not found" });
+    if (!originalUrl) 
+      return res.status(400).json({ error: "URL not found" });
 
-    return res.redirect(originalUrl);
+    return res.set(
+      'Cache-Control', 
+      'max-age=60'
+    ).redirect(originalUrl);
+
   } catch (error) {
     if (error instanceof DataAccessError) {
       console.log(error.cause);
