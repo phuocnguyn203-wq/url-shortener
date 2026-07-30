@@ -5,6 +5,6 @@ import * as urlShortener from "../controllers/shortener.controller.js";
 const router = Router();
 
 router.post("/create", authenticate, urlShortener.create);
-router.get("/:code", authenticate, urlShortener.getOriginal);
+router.get("/:code", urlShortener.getOriginal);
 
 export default router;
