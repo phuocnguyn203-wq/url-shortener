@@ -1,7 +1,6 @@
 import express from "express";
 import errorHandler from "./app/middlewares/errorHandler.middleware.js";
 import cookieParser from "cookie-parser";
-import client from "./app/clients/redis.client.js";
 
 import shortenerRouter from "./app/routes/shortener.route.js";
 import userRouter from "./app/routes/users.route.js";
@@ -29,7 +28,6 @@ app.get("/", (req, res) => {
 });
 
 async function start() {
-  await client.connect();
   app.listen(PORT, function () {
     console.log(`Listening on http://127.0.0.1:${PORT}`);
   });
@@ -37,7 +35,3 @@ async function start() {
 
 start();
 
-process.on("SIGTERM", async () => {
-  await client.quit();
-  process.exit(0);
-});

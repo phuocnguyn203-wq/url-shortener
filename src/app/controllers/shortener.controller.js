@@ -1,18 +1,12 @@
 import { shortenUrl, decodeUrl } from "../services/shortener.service.js";
-import redisClient from "../clients/redis.client.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export const getOriginal = async (req, res) => {
   const code = req.params.code;
 
-  let originalUrl = await redisClient.get(code);
-  if (originalUrl) return res.redirect(originalUrl);
-
   try {
     originalUrl = await decodeUrl(code);
     if (!originalUrl) return res.status(400).json({ error: "URL not found" });
-
-    await client.set(code, originalUrl);
 
     return res.redirect(originalUrl);
   } catch (error) {
