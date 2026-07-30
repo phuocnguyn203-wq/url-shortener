@@ -5,7 +5,7 @@ export const getOriginal = async (req, res) => {
   const code = req.params.code;
 
   try {
-    originalUrl = await decodeUrl(code);
+    const originalUrl = await decodeUrl(code);
     if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
     return res.redirect(originalUrl);
