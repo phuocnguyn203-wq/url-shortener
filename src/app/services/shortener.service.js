@@ -1,7 +1,7 @@
-import { saveUrl, readUrl, updateDelete } from "../repositories/shortener.repository.js";
+import { createShortUrl, findShortUrlById, softDeleteShortUrlById } from "../repositories/shortener.repository.js";
 import { PORT } from "../../main.js";
 
-export function convertToBase62(num) {
+export function encodeBase62(num) {
   const ALPHABET =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   if (num === 0) return ALPHABET[0];
@@ -13,7 +13,7 @@ export function convertToBase62(num) {
   return code;
 }
 
-export function decodeToInt(code) {
+export function decodeBase62(code) {
   const ALPHABET =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let num = 0;
@@ -29,27 +29,27 @@ export async function shortenUrl(originalUrl, userId) {
   //insert url to db, convert its id in db to base62
   //return shortened url
   if (URL.canParse(originalUrl)) {
-    const shortenedUrl = await saveUrl(originalUrl, userId);
-    const code = convertToBase62(shortenedUrl.id);
+    const shortenedUrl = await createShortUrl(originalUrl, userId);
+    const code = encodeBase62(shortenedUrl.id);
     return code;
   }
 
   return null;
 }
 
-export async function decodeUrl(code) {
+export async function getOriginalUrlByCode(code) {
   //decode base62 to int
   //return original url
-  const urlId = decodeToInt(code);
-  const shortUrl = await readUrl(urlId);
+  const urlId = decodeBase62(code);
+  const shortUrl = await findShortUrlById(urlId);
 
   if (!shortUrl) return null;
 
   return shortUrl.originalUrl;
 }
 
-export async function softDelete(urlId) {
-  const url = await updateDelete(urlId);
-  
+export async function softDeleteUrl(urlId) {
+  const url = await softDeleteShortUrlById(urlId);
+
   return url;
-} 
+}

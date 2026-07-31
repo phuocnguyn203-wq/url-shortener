@@ -1,16 +1,16 @@
-import { shortenUrl, decodeUrl, softDelete } from "../services/shortener.service.js";
+import { shortenUrl, getOriginalUrlByCode, softDeleteUrl } from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
-export const getOriginal = async (req, res) => {
+export const redirectToOriginalUrl = async (req, res) => {
   const code = req.params.code;
 
   /*
   Browser doesn't send If-None-Match header if response status code in range 300
-  so server can't use ETag to revalidate stale cached redirect (302)  
+  so server can't use ETag to revalidate stale cached redirect (302)
   */
 
   try {
-    const originalUrl = await decodeUrl(code);
+    const originalUrl = await getOriginalUrlByCode(code);
     if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
     return res
@@ -24,7 +24,7 @@ export const getOriginal = async (req, res) => {
   }
 };
 
-export const create = async (req, res) => {
+export const createShortUrl = async (req, res) => {
   const { originalUrl } = req.body;
   const userId = req.userId;
 
@@ -43,9 +43,9 @@ export const create = async (req, res) => {
   }
 };
 
-export const deleteUrl = async (req, res) => {
+export const deleteShortUrl = async (req, res) => {
   const urlId = Number(req.params.urlId);
   console.log(urlId);
-  const deletedUrl = await softDelete(urlId);
+  const deletedUrl = await softDeleteUrl(urlId);
   return res.json(deletedUrl);
 }

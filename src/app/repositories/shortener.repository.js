@@ -2,7 +2,7 @@ import { prisma } from "../../config/db.js";
 import { Prisma } from "../../../generated/prisma/client.ts";
 import DataAccessError from "../errors/DataAccessError.js";
 
-export async function saveUrl(originalUrl, userId) {
+export async function createShortUrl(originalUrl, userId) {
   try {
     return await prisma.shortUrl.create({
       data: {
@@ -15,7 +15,7 @@ export async function saveUrl(originalUrl, userId) {
   }
 }
 
-export async function readUrl(urlId) {
+export async function findShortUrlById(urlId) {
   try {
     return await prisma.shortUrl.findUnique({
       where: { 
@@ -27,14 +27,14 @@ export async function readUrl(urlId) {
   }
 }
 
-export async function updateDelete(urlId) {
+export async function softDeleteShortUrlById(urlId) {
   try {
-    const updateUser = await prisma.shortUrl.update({
+    const updatedShortUrl = await prisma.shortUrl.update({
       where: { id: urlId },
       data: { is_deleted: true },
     })
 
-    return updateUser;
+    return updatedShortUrl;
   } catch (error) {
     throw new DataAccessError(error.message, { cause: error });
   }
