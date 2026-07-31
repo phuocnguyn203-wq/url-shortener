@@ -4,16 +4,18 @@ import DataAccessError from "../errors/DataAccessError.js";
 export const getOriginal = async (req, res) => {
   const code = req.params.code;
 
+  /*
+  Browser doesn't send If-None-Match header if response status code in range 300
+  so server can't use ETag to revalidate stale cached redirect (302)  
+  */
+
   try {
     const originalUrl = await decodeUrl(code);
-    if (!originalUrl) 
-      return res.status(400).json({ error: "URL not found" });
+    if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
-    return res.set(
-      'Cache-Control', 
-      'max-age=60'
-    ).redirect(originalUrl);
-
+    return res
+      .set("Cache-Control", "max-age=60")
+      .redirect(originalUrl);
   } catch (error) {
     if (error instanceof DataAccessError) {
       console.log(error.cause);
