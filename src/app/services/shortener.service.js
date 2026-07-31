@@ -1,4 +1,4 @@
-import { saveUrl, readUrl } from "../repositories/shortener.repository.js";
+import { saveUrl, readUrl, updateDelete } from "../repositories/shortener.repository.js";
 import { PORT } from "../../main.js";
 
 export function convertToBase62(num) {
@@ -47,3 +47,9 @@ export async function decodeUrl(code) {
 
   return shortUrl.originalUrl;
 }
+
+export async function softDelete(urlId) {
+  const url = await updateDelete(urlId);
+  
+  return url;
+} 

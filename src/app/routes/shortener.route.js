@@ -6,5 +6,6 @@ const router = Router();
 
 router.post("/create", authenticate, urlShortener.create);
 router.get("/:code", urlShortener.getOriginal);
+router.delete("/:urlId", urlShortener.deleteUrl);
 
 export default router;

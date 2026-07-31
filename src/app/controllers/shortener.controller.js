@@ -1,4 +1,4 @@
-import { shortenUrl, decodeUrl } from "../services/shortener.service.js";
+import { shortenUrl, decodeUrl, softDelete } from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export const getOriginal = async (req, res) => {
@@ -42,3 +42,10 @@ export const create = async (req, res) => {
     }
   }
 };
+
+export const deleteUrl = async (req, res) => {
+  const urlId = Number(req.params.urlId);
+  console.log(urlId);
+  const deletedUrl = await softDelete(urlId);
+  return res.json(deletedUrl);
+}

@@ -26,3 +26,16 @@ export async function readUrl(urlId) {
     throw new DataAccessError(error.message, { cause: error });
   }
 }
+
+export async function updateDelete(urlId) {
+  try {
+    const updateUser = await prisma.shortUrl.update({
+      where: { id: urlId },
+      data: { is_deleted: true },
+    })
+
+    return updateUser;
+  } catch (error) {
+    throw new DataAccessError(error.message, { cause: error });
+  }
+}
