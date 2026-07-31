@@ -37,7 +37,6 @@ export const createShortUrl = async (req, res) => {
     return res.json({ shortUrl });
   } catch (error) {
     if (error instanceof DataAccessError) {
-      console.log(error.cause);
       return res.status(500).json({ error: "DataAccessError" });
     }
   }
@@ -45,7 +44,6 @@ export const createShortUrl = async (req, res) => {
 
 export const deleteShortUrl = async (req, res) => {
   const urlId = Number(req.params.urlId);
-  console.log(urlId);
   const deletedUrl = await softDeleteUrl(urlId);
   return res.json(deletedUrl);
 }
