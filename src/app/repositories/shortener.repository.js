@@ -40,3 +40,16 @@ export async function softDeleteShortUrlById(urlId, userId) {
     throw new DataAccessError(error.message, { cause: error });
   }
 }
+
+export async function getAllShortUrlsByUserId(userId) {
+  try {
+    const shortUrlsByUser = await prisma.shortUrl.findMany({
+      where: { userId: userId, is_deleted: false},
+    })
+
+    return shortUrlsByUser;
+  } catch (error) {
+    throw new DataAccessError(error.message, { cause: error });
+  }
+
+}

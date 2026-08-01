@@ -1,4 +1,4 @@
-import { createShortUrl, findShortUrlById, softDeleteShortUrlById } from "../repositories/shortener.repository.js";
+import { createShortUrl, findShortUrlById, softDeleteShortUrlById, getAllShortUrlsByUserId } from "../repositories/shortener.repository.js";
 import { PORT } from "../../main.js";
 
 export function encodeBase62(num) {
@@ -53,4 +53,8 @@ export async function softDeleteUrl(code, userId) {
   const url = await softDeleteShortUrlById(urlId, userId);
 
   return url;
+}
+
+export async function getAllMyShortUrls(userId) {
+  return await getAllShortUrlsByUserId(userId);  
 }

@@ -1,4 +1,4 @@
-import { shortenUrl, getOriginalUrlByCode, softDeleteUrl } from "../services/shortener.service.js";
+import { shortenUrl, getOriginalUrlByCode, softDeleteUrl, getAllMyShortUrls } from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export const redirectToOriginalUrl = async (req, res) => {
@@ -36,4 +36,10 @@ export const deleteShortUrl = async (req, res) => {
   const userId = req.userId;
   const deletedUrl = await softDeleteUrl(code, userId);
   return res.json(deletedUrl);
+}
+
+export const allMyShortUrls = async (req, res) => {
+  const userId = req.userId;
+  const allShortUrls = await getAllMyShortUrls(userId);
+  return res.send(allShortUrls);
 }
