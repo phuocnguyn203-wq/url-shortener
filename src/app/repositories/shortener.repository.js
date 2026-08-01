@@ -41,10 +41,10 @@ export async function softDeleteShortUrlById(urlId, userId) {
   }
 }
 
-export async function getAllShortUrlsByUserId(userId) {
+export async function getAllShortUrlsByUserId(userId, isDeleted=false) {
   try {
     const shortUrlsByUser = await prisma.shortUrl.findMany({
-      where: { userId: userId, is_deleted: false},
+      where: { userId: userId, is_deleted: isDeleted},
     })
 
     return shortUrlsByUser;

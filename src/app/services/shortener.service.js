@@ -55,6 +55,6 @@ export async function softDeleteUrl(code, userId) {
   return url;
 }
 
-export async function getAllMyShortUrls(userId) {
-  return await shortenerRepo.getAllShortUrlsByUserId(userId);  
+export async function getAllMyShortUrls(userId, isDeleted=false) {
+  return await shortenerRepo.getAllShortUrlsByUserId(userId, isDeleted);  
 }
