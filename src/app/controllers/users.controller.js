@@ -7,6 +7,12 @@ import {
 } from "../services/users.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
+function toUserDto(user) {
+  return {
+    username: user.username,
+  };
+}
+
 export const signUp = async (req, res) => {
   const user = await createUser(req.body.username, req.body.password);
   return res.json(user);
@@ -33,5 +39,6 @@ export const signIn = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
   const userId = req.userId;
   const user = await getUserById(userId);
-  return res.json({ user });
+  const formattedUser = toUserDto(user);
+  return res.json(formattedUser);
 };
