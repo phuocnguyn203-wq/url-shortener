@@ -21,11 +21,11 @@ app.use(cookieParser());
 app.use("/shortened", shortenerRouter);
 app.use("/users", userRouter);
 
-app.use(errorHandler);
-
 app.get("/", (req, res) => {
   res.send("hello, world");
 });
+
+app.use(errorHandler);
 
 async function start() {
   app.listen(PORT, function () {
