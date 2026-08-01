@@ -1,6 +1,6 @@
 export default class DataAccessError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(message, options) {
+    super(message, options);
     this.name = "DataAccessError";
   }
 }
