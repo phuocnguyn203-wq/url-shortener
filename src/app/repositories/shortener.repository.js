@@ -19,7 +19,8 @@ export async function findShortUrlById(urlId) {
   try {
     return await prisma.shortUrl.findUnique({
       where: { 
-        id: urlId
+        id: urlId,
+        is_deleted: false
       },
     });
   } catch (error) {
