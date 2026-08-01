@@ -22,7 +22,7 @@ export function authenticate(req, res, next) {
       error instanceof jwt.JsonWebTokenError
     )
       // 401 means can't not authenticate
-      return res.status(401).json({ error: "404" });
+      return res.status(401).json({ error: "401" });
   }
   // next to hand off responsibility to handle error
   // although every errors jwt.verify throws are JsonWebTokenError and subclasses
