@@ -1,7 +1,6 @@
 import { prisma } from "../../config/db.js";
 import { Prisma } from "../../../generated/prisma/client.ts";
 import DataAccessError from "../errors/DataAccessError.js";
-import { use } from "react";
 
 export async function insertUserToDb(username, hashedPassword) {
   try {
