@@ -40,6 +40,12 @@ export const deleteShortUrl = async (req, res) => {
 
 export const allMyShortUrls = async (req, res) => {
   const userId = req.userId;
-  const allShortUrls = await shortenService.getAllMyShortUrls(userId);
+  const allShortUrls = await shortenService.getAllMyShortUrls(userId, false);
   return res.send(allShortUrls);
+}
+
+export const allMyDeletedShortUrls = async (req, res) => {
+  const userId = req.userId;
+  const allDeletedShortUrls = await shortenService.getAllMyShortUrls(userId, true);
+  return res.send(allDeletedShortUrls);
 }
