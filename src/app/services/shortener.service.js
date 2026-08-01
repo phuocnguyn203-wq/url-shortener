@@ -1,4 +1,4 @@
-import { createShortUrl, findShortUrlById, softDeleteShortUrlById, getAllShortUrlsByUserId } from "../repositories/shortener.repository.js";
+import * as shortenerRepo from '../repositories/shortener.repository.js';
 import { PORT } from "../../main.js";
 
 export function encodeBase62(num) {
@@ -29,7 +29,7 @@ export async function shortenUrl(originalUrl, userId) {
   //insert url to db, convert its id in db to base62
   //return shortened url
   if (URL.canParse(originalUrl)) {
-    const shortenedUrl = await createShortUrl(originalUrl, userId);
+    const shortenedUrl = await shortenerRepo.createShortUrl(originalUrl, userId);
     const code = encodeBase62(shortenedUrl.id);
     return code;
   }
@@ -41,7 +41,7 @@ export async function getOriginalUrlByCode(code) {
   //decode base62 to int
   //return original url
   const urlId = decodeBase62(code);
-  const shortUrl = await findShortUrlById(urlId);
+  const shortUrl = await shortenerRepo.findShortUrlById(urlId);
 
   if (!shortUrl) return null;
 
@@ -50,11 +50,11 @@ export async function getOriginalUrlByCode(code) {
 
 export async function softDeleteUrl(code, userId) {
   const urlId = decodeBase62(code);
-  const url = await softDeleteShortUrlById(urlId, userId);
+  const url = await shortenerRepo.softDeleteShortUrlById(urlId, userId);
 
   return url;
 }
 
 export async function getAllMyShortUrls(userId) {
-  return await getAllShortUrlsByUserId(userId);  
+  return await shortenerRepo.getAllShortUrlsByUserId(userId);  
 }

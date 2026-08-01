@@ -1,4 +1,4 @@
-import { shortenUrl, getOriginalUrlByCode, softDeleteUrl, getAllMyShortUrls } from "../services/shortener.service.js";
+import * as shortenService from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export const redirectToOriginalUrl = async (req, res) => {
@@ -9,7 +9,7 @@ export const redirectToOriginalUrl = async (req, res) => {
   so server can't use ETag to revalidate stale cached redirect (302)
   */
 
-  const originalUrl = await getOriginalUrlByCode(code);
+  const originalUrl = await shortenService.getOriginalUrlByCode(code);
   if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
   return res
@@ -23,7 +23,7 @@ export const createShortUrl = async (req, res) => {
 
   if (!originalUrl) return res.status(400).json({ error: "URL is required " });
 
-  const code = await shortenUrl(originalUrl, userId);
+  const code = await shortenService.shortenUrl(originalUrl, userId);
   if (code === null) return res.status(400).json({ error: "Invalid URL" });
 
   const shortUrl = `${req.protocol}://${req.get("host")}/shortened/${code}`;
@@ -34,12 +34,12 @@ export const createShortUrl = async (req, res) => {
 export const deleteShortUrl = async (req, res) => {
   const code = req.params.code;
   const userId = req.userId;
-  const deletedUrl = await softDeleteUrl(code, userId);
+  const deletedUrl = await shortenService.softDeleteUrl(code, userId);
   return res.json(deletedUrl);
 }
 
 export const allMyShortUrls = async (req, res) => {
   const userId = req.userId;
-  const allShortUrls = await getAllMyShortUrls(userId);
+  const allShortUrls = await shortenService.getAllMyShortUrls(userId);
   return res.send(allShortUrls);
 }
