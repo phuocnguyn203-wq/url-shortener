@@ -9,19 +9,12 @@ export const redirectToOriginalUrl = async (req, res) => {
   so server can't use ETag to revalidate stale cached redirect (302)
   */
 
-  try {
-    const originalUrl = await getOriginalUrlByCode(code);
-    if (!originalUrl) return res.status(400).json({ error: "URL not found" });
+  const originalUrl = await getOriginalUrlByCode(code);
+  if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
-    return res
-      .set("Cache-Control", "max-age=60")
-      .redirect(originalUrl);
-  } catch (error) {
-    if (error instanceof DataAccessError) {
-      console.log(error.cause);
-      return res.status(500).json({ error: "DataAccessError" });
-    }
-  }
+  return res
+    .set("Cache-Control", "max-age=60")
+    .redirect(originalUrl);
 };
 
 export const createShortUrl = async (req, res) => {
