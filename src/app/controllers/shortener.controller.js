@@ -1,6 +1,18 @@
 import * as shortenService from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
+function toShortUrlDto(shortUrl) {
+  const code = shortenService.encodeBase62(shortUrl.id);
+  const updatedAt = shortUrl.updatedAt;
+  const originalUrl = shortUrl.originalUrl;
+
+  return {
+    code,
+    updatedAt,
+    originalUrl,
+  };
+}
+
 export const redirectToOriginalUrl = async (req, res) => {
   const code = req.params.code;
 
@@ -12,9 +24,7 @@ export const redirectToOriginalUrl = async (req, res) => {
   const originalUrl = await shortenService.getOriginalUrlByCode(code);
   if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
-  return res
-    .set("Cache-Control", "max-age=60")
-    .redirect(originalUrl);
+  return res.set("Cache-Control", "max-age=60").redirect(originalUrl);
 };
 
 export const createShortUrl = async (req, res) => {
@@ -28,7 +38,6 @@ export const createShortUrl = async (req, res) => {
 
   const shortUrl = `${req.protocol}://${req.get("host")}/shortened/${code}`;
   return res.json({ shortUrl });
-
 };
 
 export const deleteShortUrl = async (req, res) => {
@@ -36,16 +45,28 @@ export const deleteShortUrl = async (req, res) => {
   const userId = req.userId;
   const deletedUrl = await shortenService.softDeleteUrl(code, userId);
   return res.json(deletedUrl);
-}
+};
 
 export const allMyShortUrls = async (req, res) => {
   const userId = req.userId;
-  const allShortUrls = await shortenService.getAllMyShortUrls(userId, false);
-  return res.send(allShortUrls);
-}
+  const allShortUrlsByUser = await shortenService.getAllMyShortUrls(
+    userId,
+    false,
+  );
+  const alLFormatedShortUrls = allShortUrlsByUser.map((item) =>
+    toShortUrlDto(item),
+  );
+  return res.send(alLFormatedShortUrls);
+};
 
 export const allMyDeletedShortUrls = async (req, res) => {
   const userId = req.userId;
-  const allDeletedShortUrls = await shortenService.getAllMyShortUrls(userId, true);
-  return res.send(allDeletedShortUrls);
-}
+  const allDeletedShortUrls = await shortenService.getAllMyShortUrls(
+    userId,
+    true,
+  );
+  const allFormatedShortUrls = allDeletedShortUrls.map((item) =>
+    toShortUrlDto(item),
+  );
+  return res.send(allFormatedShortUrls);
+};
