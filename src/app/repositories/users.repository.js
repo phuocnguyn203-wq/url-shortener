@@ -3,7 +3,7 @@ import DataAccessError from "../errors/DataAccessError.js";
 
 export async function insertUserToDb(username, hashedPassword) {
   try {
-    return await prisma.User.create({
+    return await prisma.user.create({
       data: {
         username: username,
         hashedPassword: hashedPassword,
@@ -16,7 +16,7 @@ export async function insertUserToDb(username, hashedPassword) {
 
 export async function fetchUserById(userId) {
   try {
-    return await prisma.User.findUnique({
+    return await prisma.user.findUnique({
       where: { id: userId },
     });
   } catch (error) {
@@ -26,7 +26,7 @@ export async function fetchUserById(userId) {
 
 export async function fetchUserByUsername(username) {
   try {
-    return await prisma.User.findUnique({
+    return await prisma.user.findUnique({
       where: { username: username },
     });
   } catch (error) {
