@@ -1,5 +1,4 @@
 import { prisma } from "../../config/db.js";
-import { Prisma } from "../../../generated/prisma/client.ts";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export async function createShortUrl(originalUrl, userId) {

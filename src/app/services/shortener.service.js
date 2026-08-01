@@ -1,5 +1,4 @@
 import * as shortenerRepo from '../repositories/shortener.repository.js';
-import { PORT } from "../../main.js";
 
 export function encodeBase62(num) {
   const ALPHABET =
