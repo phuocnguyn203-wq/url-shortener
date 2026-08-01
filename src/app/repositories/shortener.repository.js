@@ -27,10 +27,10 @@ export async function findShortUrlById(urlId) {
   }
 }
 
-export async function softDeleteShortUrlById(urlId) {
+export async function softDeleteShortUrlById(urlId, userId) {
   try {
     const updatedShortUrl = await prisma.shortUrl.update({
-      where: { id: urlId },
+      where: { id: urlId , userId: userId},
       data: { is_deleted: true },
     })
 

@@ -4,8 +4,8 @@ import * as urlShortener from "../controllers/shortener.controller.js";
 
 const router = Router();
 
-router.post("/create", authenticate, urlShortener.createShortUrl);
+router.post("/", authenticate, urlShortener.createShortUrl);
 router.get("/:code", urlShortener.redirectToOriginalUrl);
-router.delete("/:urlId", urlShortener.deleteShortUrl);
+router.delete("/:code", authenticate, urlShortener.deleteShortUrl);
 
 export default router;

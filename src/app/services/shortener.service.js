@@ -48,8 +48,9 @@ export async function getOriginalUrlByCode(code) {
   return shortUrl.originalUrl;
 }
 
-export async function softDeleteUrl(urlId) {
-  const url = await softDeleteShortUrlById(urlId);
+export async function softDeleteUrl(code, userId) {
+  const urlId = decodeBase62(code);
+  const url = await softDeleteShortUrlById(urlId, userId);
 
   return url;
 }

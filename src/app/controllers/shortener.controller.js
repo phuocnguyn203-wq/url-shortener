@@ -32,7 +32,8 @@ export const createShortUrl = async (req, res) => {
 };
 
 export const deleteShortUrl = async (req, res) => {
-  const urlId = Number(req.params.urlId);
-  const deletedUrl = await softDeleteUrl(urlId);
+  const code = req.params.code;
+  const userId = req.userId;
+  const deletedUrl = await softDeleteUrl(code, userId);
   return res.json(deletedUrl);
 }
