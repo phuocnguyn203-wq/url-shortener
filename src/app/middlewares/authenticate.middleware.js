@@ -21,7 +21,8 @@ export function authenticate(req, res, next) {
       error instanceof jwt.TokenExpiredError ||
       error instanceof jwt.JsonWebTokenError
     )
-      return res.status(404).json({ error: "404" });
+      // 401 means can't not authenticate
+      return res.status(401).json({ error: "404" });
   }
 
   next();
