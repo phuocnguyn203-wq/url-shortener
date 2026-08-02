@@ -21,7 +21,7 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
   const user = await getUserByUsername(req.body.username);
-  if (!user || !verifyPassword(req.body.password, user.hashedPassword)) {
+  if (!user || ! await verifyPassword(req.body.password, user.hashedPassword)) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
