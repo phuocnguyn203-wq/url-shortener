@@ -27,7 +27,7 @@ afterAll(async () => {
 async function createTestUser(username="alice") {
 	return await prisma.user.create({
 		data: {
-			username: 'johndoe',
+			username: username,
 			hashedPassword: 'fake-hashed-password'
 		}
 	})
