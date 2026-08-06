@@ -2,7 +2,7 @@ import {
 	it,
 	expect,
 	describe,
-	beforeAll,
+	beforeEach,
 	afterAll,
 	beforeEach
 } from "vitest";
@@ -15,7 +15,7 @@ import {
 
 import { prisma } from "../../src/config/db.js";
 
-beforeAll(async () => {
+beforeEach(async () => {
 	await prisma.shortUrl.deleteMany();
 	await prisma.user.deleteMany();
 })
@@ -56,7 +56,7 @@ describe("fetchUserByUsername", () => {
 	it("returns user when given username that exists", async () => {
 		const user = await createTestUser();
 
-		const result = await fetchUserByUsername(user.userName);
+		const result = await fetchUserByUsername(user.username);
 
 		expect(result).toEqual(user);
 	})
