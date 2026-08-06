@@ -32,3 +32,8 @@ test('round-trips encode -> decode back to the original number', () => {
 test('decoding a code with characters outside the alphabet does not throw', () => {
   expect(() => decodeBase62('!!!')).not.toThrow();
 });
+
+/* Nothing to test other functions in shortener service
+they are just simple, call other functions that will be tested
+as unit test. They will be tested in integration test 
+*/
