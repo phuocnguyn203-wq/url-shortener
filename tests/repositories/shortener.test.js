@@ -161,4 +161,23 @@ describe("softDeleteShortUrlById", async () => {
 
     expect(result).toBe(false);
   })
+
+  it("doesn't delete when it's deleted already", async () => {
+    const user = await createTestUser();
+
+    const deletedShortUrl = await prisma.shortUrl.create({
+      data: {
+        originalUrl: "http://example.com",
+        userId: user.id,
+        is_deleted: true,
+      }
+    }) 
+
+    const result = await softDeleteShortUrlById(
+      deletedShortUrl.id,
+      user.id,
+    )
+
+    expect(result).toBe(false);
+  })
 })
