@@ -137,12 +137,19 @@ describe("softDeleteShortUrlById", async () => {
       user.id,
     )
 
-    expect(result).not.toBeNull();
-    expect(result.id).toBe(shortUrl.id);
-    expect(result.is_deleted).toBe(true);
+    expect(result).toBe(true);
+
+    const url = await prisma.shortUrl.findUnique({
+      where: {
+        id: shortUrl.id,
+        is_deleted: false
+      }
+    });
+
+    expect(url).toBeNull();
   })
 
-  it("doesn't delete when userId doesn't match", async () => {
+  it("returns false when userId doesn't match", async () => {
     
     const user = await createTestUser();
     const otherUser = await createTestUser("john");
@@ -162,7 +169,7 @@ describe("softDeleteShortUrlById", async () => {
     expect(result).toBe(false);
   })
 
-  it("doesn't delete when it's deleted already", async () => {
+  it("returns false when it's deleted already", async () => {
     const user = await createTestUser();
 
     const deletedShortUrl = await prisma.shortUrl.create({
