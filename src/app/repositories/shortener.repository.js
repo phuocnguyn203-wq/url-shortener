@@ -29,12 +29,12 @@ export async function findShortUrlById(urlId) {
 
 export async function softDeleteShortUrlById(urlId, userId) {
   try {
-    const updatedShortUrl = await prisma.shortUrl.update({
+    const result = await prisma.shortUrl.updateMany({
       where: { id: urlId , userId: userId},
       data: { is_deleted: true },
     })
 
-    return updatedShortUrl;
+    return result > 0;
   } catch (error) {
     throw new DataAccessError(error.message, { cause: error });
   }
