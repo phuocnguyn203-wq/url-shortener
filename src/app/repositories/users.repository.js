@@ -1,4 +1,5 @@
 import { prisma } from "../../config/db.js";
+import { Prisma } from "../../../generated/prisma/client.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 export async function insertUserToDb(username, hashedPassword) {
@@ -10,6 +11,9 @@ export async function insertUserToDb(username, hashedPassword) {
       },
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError, error.code === "P2002"){
+      return new DataAccessError("Username already exists", { cause: error });
+    }
     throw new DataAccessError(error.message, { cause: error });
   }
 }
