@@ -13,6 +13,10 @@ import {
 	insertUserToDb
 } from "../../src/app/repositories/users.repository.js";
 
+import {
+	DataAccessError
+} from "../../src/app/errors/DataAccessError.js";
+
 import { prisma } from "../../src/config/db.js";
 
 beforeEach(async () => {
@@ -65,5 +69,37 @@ describe("fetchUserByUsername", () => {
 		const result = await fetchUserByUsername("It doesn't exist");
 
 		expect(result).toBeNull();
+	})
+})
+
+describe("insertUserToDb", async () => {
+	it("inserts user when given username and hashedPassword", async () => {
+		const user = await insertUserToDb(
+			"johndoe",
+			"fake-hashed-password",
+		)
+
+		expect(user.username).toBe("johndoe");
+		expect(user.hashedPassword).toBe("fake-hashed-password");
+
+		const justInsertedUser = await prisma.user.findUnique({
+			where: {id: user.id,}
+		});
+
+		expect(justInsertedUser).toEqual(user);
+	})
+
+	it("doesn't insert and returns null when given existed username", async () => {
+		const user = await createTestUser("johndoe");
+		try {
+			const user = await insertUserToDb(
+				"johndoe",
+				"fake-hashed-password"
+			);
+		} catch (err) {
+			expect(err).toBeInstanceOf(DataAccessError);
+			expect(err.message).toBe("Username already exists");
+		}
+		
 	})
 })
