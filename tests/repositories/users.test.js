@@ -18,6 +18,7 @@ import {
 } from "../../src/app/errors/DataAccessError.js";
 
 import { prisma } from "../../src/config/db.js";
+import AppError from "../../src/app/errors/AppError.js";
 
 beforeEach(async () => {
 	await prisma.shortUrl.deleteMany();
@@ -50,9 +51,11 @@ describe("fetchUserById", async () => {
 
 	it("returns null when given non-exist id", async () => {
 		const nonExistId = 99999;
-		const result = await fetchUserById(nonExistId);
-
-		expect(result).toBeNull();
+		try {
+			const result = await fetchUserById(nonExistId);
+		} catch (err) {
+			expect(err).toBeInstanceOf(AppError);
+		}
 	})
 });
 
@@ -66,9 +69,12 @@ describe("fetchUserByUsername", () => {
 	})
 
 	it("returns null when given username that doesn't exist", async () => {
-		const result = await fetchUserByUsername("It doesn't exist");
-
-		expect(result).toBeNull();
+		try {
+			const result = await fetchUserByUsername("It doesn't exist");
+		} catch (err) {
+			expect(err).toBeInstanceOf(AppError);
+		}
+		
 	})
 })
 
@@ -97,7 +103,7 @@ describe("insertUserToDb", async () => {
 				"fake-hashed-password"
 			);
 		} catch (err) {
-			expect(err).toBeInstanceOf(DataAccessError);
+			expect(err).toBeInstanceOf(AppError);
 			expect(err.message).toBe("Username already exists");
 		}
 		

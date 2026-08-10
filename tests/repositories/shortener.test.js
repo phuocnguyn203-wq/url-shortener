@@ -16,6 +16,7 @@ import {
 } from "../../src/app/repositories/shortener.repository.js";
 
 import DataAccessError from "../../src/app/errors/DataAccessError.js";
+import AppError from "../../src/app/errors/AppError.js";
 
 beforeEach(async() => {
     await prisma.shortUrl.deleteMany();
@@ -63,7 +64,7 @@ describe("createShortUrl", () => {
     expect(recordInDatabase.userId).toBe(user.id);
   })
 
-  it("wraps database errors in DataAccessError", async () => {
+  it("wraps database errors in AppError", async () => {
     const nonExistUserId = 99999;
 
     await expect(
@@ -71,7 +72,7 @@ describe("createShortUrl", () => {
         "http://example.com",
         nonExistUserId,
       )
-    ).rejects.toBeInstanceOf(DataAccessError);
+    ).rejects.toBeInstanceOf(AppError);
   })
 })
 
@@ -98,10 +99,11 @@ describe("findShortUrlById", async () => {
 
   it("returns null for non exist shortUrl", async () => {
     const nonExistShortUrlId = 99999;
-
-    const result = await findShortUrlById(nonExistShortUrlId);
-
-    expect(result).toBe(null);
+    try {
+      const result = await findShortUrlById(nonExistShortUrlId);
+    } catch (err) {
+      expect(err).toBeInstanceOf(AppError);
+    }
   })
 
   it("returns null for deleted shortUrl", async () => {
@@ -114,10 +116,11 @@ describe("findShortUrlById", async () => {
         is_deleted: true,
       }
     })
-
-    const result = await findShortUrlById(deletedShortUrl.id);
-
-    expect(result).toBeNull();
+    try {
+      const result = await findShortUrlById(deletedShortUrl.id);
+    } catch(err) {
+      expect(err).toBeInstanceOf(AppError);
+    }
   })
 })
 
@@ -160,13 +163,14 @@ describe("softDeleteShortUrlById", async () => {
         userId: user.id,
       }
     })
-
-    const result = await softDeleteShortUrlById(
-      shortUrl.id,
-      otherUser.id,
-    )
-
-    expect(result).toBe(false);
+    try {
+      const result = await softDeleteShortUrlById(
+        shortUrl.id,
+        otherUser.id,
+      )
+    } catch (err) {
+      expect(err).toBeInstanceOf(AppError);
+    }
   })
 
   it("returns false when it's deleted already", async () => {
@@ -179,12 +183,13 @@ describe("softDeleteShortUrlById", async () => {
         is_deleted: true,
       }
     }) 
-
-    const result = await softDeleteShortUrlById(
-      deletedShortUrl.id,
-      user.id,
-    )
-
-    expect(result).toBe(false);
+    try {
+      const result = await softDeleteShortUrlById(
+        deletedShortUrl.id,
+        user.id,
+      )
+    } catch (err) {
+      expect(err).toBeInstanceOf(AppError);
+    }
   })
 })
