@@ -4,7 +4,6 @@ import {
 	describe,
 	beforeEach,
 	afterAll,
-	beforeEach
 } from "vitest";
 
 import {
