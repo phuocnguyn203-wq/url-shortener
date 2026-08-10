@@ -1,5 +1,5 @@
 import { prisma } from "../../config/db.js";
-import { Prisma } from "../../../generated/prisma/client.js";
+import { Prisma } from "../../../generated/prisma/client.ts";
 import DataAccessError from "../errors/DataAccessError.js";
 import AppError  from "../errors/AppError.js";
 
