@@ -10,8 +10,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-export const PORT = 3000;
-
 app.set("view engine", "ejs");
 
 app.use(express.json());
@@ -27,11 +25,5 @@ app.get("/", (req, res) => {
 
 app.use(errorHandler);
 
-async function start() {
-  app.listen(PORT, function () {
-    console.log(`Listening on http://127.0.0.1:${PORT}`);
-  });
-}
-
-start();
+export default app;
 
