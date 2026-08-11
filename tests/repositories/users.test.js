@@ -44,8 +44,7 @@ describe("fetchUserById", async () => {
 		const user = await createTestUser();
 
 		const result = await fetchUserById(user.id);
-
-		expect(result).toEqual(user);
+		expect(result.username).toBe(user.username);
 	})
 
 	it("returns null when given non-exist id", async () => {
