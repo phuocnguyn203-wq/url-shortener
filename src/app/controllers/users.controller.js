@@ -16,7 +16,7 @@ function toUserDto(user) {
 export const signUp = async (req, res) => {
   const user = await createUser(req.body.username, req.body.password);
   const formattedUser = toUserDto(user);
-  return res.json(formattedUser);
+  return res.status(201).json(formattedUser);
 };
 
 export const signIn = async (req, res) => {
