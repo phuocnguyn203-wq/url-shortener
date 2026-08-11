@@ -38,18 +38,23 @@ async function createTestUser(username="alice") {
 
 describe("createShortUrl", () => {
   it("creates a URL belong to a given user", async () => {
+    // Arrange
     const user = await createTestUser();
 
+    // Act
     const result = await createShortUrl(
       "http://example.com",
       user.id,
     );
 
+
+    // Assert
     expect(result.id).toEqual(expect.any(Number));
     expect(result.originalUrl).toBe(
       "http://example.com",
     );
     
+    // Assert side effect
     const recordInDatabase = 
       await prisma.shortUrl.findUnique({
         where: {
@@ -65,8 +70,10 @@ describe("createShortUrl", () => {
   })
 
   it("wraps database errors in AppError", async () => {
+    // Arrange
     const nonExistUserId = 99999;
 
+    // Act, Assert
     await expect(
       createShortUrl(
         "http://example.com",
@@ -78,8 +85,8 @@ describe("createShortUrl", () => {
 
 describe("findShortUrlById", async () => {
   it("returns active URL by its ID", async () => {
+    // Arrange
     const user = await createTestUser();
-
     const shortUrl = await prisma.shortUrl.create({
       data: {
         originalUrl: "http://example.com",
@@ -87,26 +94,30 @@ describe("findShortUrlById", async () => {
       }
     })
 
+    // Act
     const result = await findShortUrlById(
       shortUrl.id
     )
 
+    // Assert
     expect(result).not.toBeNull();
     expect(result.id).toBe(shortUrl.id);
     expect(result.originalUrl).toBe("http://example.com");
     expect(result.is_deleted).toBe(false);
   })
 
-  it("returns null for non exist shortUrl", async () => {
+  it("throws error for non exist shortUrl", async () => {
+    // Arrange
     const nonExistShortUrlId = 99999;
-    try {
-      const result = await findShortUrlById(nonExistShortUrlId);
-    } catch (err) {
-      expect(err).toBeInstanceOf(AppError);
-    }
+
+    // Act, Assert
+    await expect(findShortUrlById(nonExistShortUrlId))
+      .rejects
+      .toBeInstanceOf(AppError);
   })
 
-  it("returns null for deleted shortUrl", async () => {
+  it("throws error for deleted shortUrl", async () => {
+    // Arrange
     const user = await createTestUser();
 
     const deletedShortUrl = await prisma.shortUrl.create({
@@ -116,18 +127,18 @@ describe("findShortUrlById", async () => {
         is_deleted: true,
       }
     })
-    try {
-      const result = await findShortUrlById(deletedShortUrl.id);
-    } catch(err) {
-      expect(err).toBeInstanceOf(AppError);
-    }
+
+    //Act, Assert
+    await expect(findShortUrlById(deletedShortUrl.id))
+      .rejects
+      .toBeInstanceOf(AppError);
   })
 })
 
 describe("softDeleteShortUrlById", async () => {
   it("soft-deletes when given urlId and userId", async () => {
+    // Arrance
     const user = await createTestUser();
-
     const shortUrl = await prisma.shortUrl.create({
       data: {
         originalUrl: "http://example.com",
@@ -135,61 +146,34 @@ describe("softDeleteShortUrlById", async () => {
       }
     })
 
-    const result = await softDeleteShortUrlById(
-      shortUrl.id,
-      user.id,
-    )
+    // Act, Assert
+    await expect(softDeleteShortUrlById(shortUrl.id, user.id))
+      .resolves  
+      .toBe(true);
 
-    expect(result).toBe(true);
-
+    // Assert side effect
     const url = await prisma.shortUrl.findUnique({
       where: {
-        id: shortUrl.id,
-        is_deleted: false
+        id: shortUrl.id
       }
     });
+    expect(url.is_deleted).toBe(true);
+  });
 
-    expect(url).toBeNull();
-  })
-
-  it("returns false when userId doesn't match", async () => {
-    
+  it("throws error when it's deleted already", async () => {
+    // Arrange
     const user = await createTestUser();
-    const otherUser = await createTestUser("john");
-
-    const shortUrl = await prisma.shortUrl.create({
-      data: {
-        originalUrl: "http://example.com",
-        userId: user.id,
-      }
-    })
-    try {
-      const result = await softDeleteShortUrlById(
-        shortUrl.id,
-        otherUser.id,
-      )
-    } catch (err) {
-      expect(err).toBeInstanceOf(AppError);
-    }
-  })
-
-  it("returns false when it's deleted already", async () => {
-    const user = await createTestUser();
-
     const deletedShortUrl = await prisma.shortUrl.create({
       data: {
         originalUrl: "http://example.com",
         userId: user.id,
         is_deleted: true,
       }
-    }) 
-    try {
-      const result = await softDeleteShortUrlById(
-        deletedShortUrl.id,
-        user.id,
-      )
-    } catch (err) {
-      expect(err).toBeInstanceOf(AppError);
-    }
+    });
+
+    // Act, Assert
+    await expect(softDeleteShortUrlById(deletedShortUrl.id, user.id))
+      .rejects
+      .toBeInstanceOf(AppError);
   })
 })

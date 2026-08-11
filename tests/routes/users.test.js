@@ -30,6 +30,7 @@ describe("POST /users/create", () => {
 
     // Assert
     expect(response.status).toBe(201);
+    expect(response.body).not.toHaveProperty("hashedPassword");
     
     // Assert side effect
     const user = await prisma.user.findUnique({
@@ -98,7 +99,7 @@ describe("POST /users/login", () => {
     expect(response.header['set-cookie'][0]).toContain("token=");
   });
 
-  it("returns 401 when not given wrong password", async () => {
+  it("returns 401 when given wrong password", async () => {
     // Arrange
     const username = "johndoe";
     const password = "123";
@@ -139,10 +140,9 @@ describe("GET /users/me", () => {
       .send({
         username, password
       });
-    
     const cookie = loginResponse
       .headers["set-cookie"][0]
-      .split(':')[0]
+      .split(';')[0]
 
     // Act
     const response = await request(app)

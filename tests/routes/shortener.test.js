@@ -116,13 +116,14 @@ describe("GET /shortened", () => {
     // Arrange
     const { user, token } = await createNewUser();
 
+    const shortUrls =  [
+      { originalUrl: "https://amazon.com", userId: user.id},
+      { originalUrl: "https://netflix.com", userId: user.id},
+      { originalUrl: "https://microsoft.com", userId: user.id },
+      { originalUrl: "https://palantir.com", userId: user.id }, 
+    ];
     await prisma.shortUrl.createMany({
-      data: [
-        { originalUrl: "https://amazon.com", userId: user.id},
-        { originalUrl: "https://netflix.com", userId: user.id},
-        { originalUrl: "https://microsoft.com", userId: user.id },
-        { originalUrl: "https://palantir.com", userId: user.id }, 
-      ]
+      data: shortUrls 
     })
     
     // Act
@@ -133,12 +134,19 @@ describe("GET /shortened", () => {
     // Assert
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(4);
-    expect(response.body[0].originalUrl).toBe("https://amazon.com");
+    const expectArray = shortUrls.map((shortUrl) => {
+      return expect.objectContaining({ 
+        originalUrl: shortUrl.originalUrl 
+      });
+    });
+    expect(response.body).toEqual(
+      expect.arrayContaining(expectArray)
+    )
   });
 });
 
-describe("DELETE /shortened", () => {
-  it("deletes when given id of shortUrl of owner", async () => {
+describe("DELETE /shortened", async () => {
+  it("deletes when given code of shortUrl of owner", async () => {
     // Arrange
     const { user, token } = await createNewUser();
     const shortUrl = await prisma.shortUrl.create({
@@ -159,10 +167,10 @@ describe("DELETE /shortened", () => {
     expect(response.body).toBe(true);
 
     // Assert side effect
-    const deletedShortUrl = prisma.shortUrl.findUnique({
+    const deletedShortUrl = await prisma.shortUrl.findUnique({
       where: {
         id: shortUrl.id,
-        deleted: true,
+        is_deleted: true,
       }
     });
     expect(deletedShortUrl).not.toBeNull();
@@ -173,13 +181,13 @@ describe("GET shortened/deleted", () => {
   it("returns shortUrl deleted", async () => {
     // Arrange
     const { user, token } = await createNewUser();
-    const deletedUrls = [
+    const data = [
       { originalUrl: "https://example.com", is_deleted: true, userId: user.id },
       { originalUrl: "https://amazon.com", is_deleted: false, userId: user.id },
       { originalUrl: "https://beginnerdev.com", is_deleted: true, userId: user.id },
-    ]
-    const deletedShortUrl = await prisma.shortUrl.createMany({
-      data: deletedUrls
+    ];
+    const shortUrls = await prisma.shortUrl.createMany({
+      data: data
     });
 
     //Act
@@ -190,7 +198,17 @@ describe("GET shortened/deleted", () => {
     // Assert
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(2);
-    expect(response.body[1].originalUrl).toEqual(deletedUrls[2].originalUrl);
+    
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          originalUrl: "https://example.com",
+        }),
+        expect.objectContaining({
+          originalUrl: "https://beginnerdev.com",
+        }),
+      ]),
+    );
   })
 });
 

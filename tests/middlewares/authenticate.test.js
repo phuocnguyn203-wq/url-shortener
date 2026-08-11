@@ -3,7 +3,7 @@ import {
   expect,
   it,
   beforeEach,
-  afterAll,
+  afterEach,
   vi
 } from 'vitest';
 
@@ -33,6 +33,10 @@ describe("authenticate", async () => {
     await prisma.user.deleteMany();
 
     vi.clearAllMocks();
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   })
 
   it("returns 401 when token is missing", () => {
@@ -70,7 +74,7 @@ describe("authenticate", async () => {
 
     // Assert
 
-    expect(req.userId).toBeTypeOf("number");
+    expect(req.userId).toBe(user.id);
     expect(next).toHaveBeenCalledOnce();
   })
 
@@ -90,7 +94,7 @@ describe("authenticate", async () => {
     // Assert
     expect(verifySpy).toHaveBeenCalledOnce();
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalled({ error: "401" });
+    expect(res.json).toHaveBeenCalledWith({ error: "401" });
 
     expect(next).not.toHaveBeenCalled();
   })
