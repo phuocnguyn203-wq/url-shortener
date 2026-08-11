@@ -8,9 +8,8 @@ import {
 import DataAccessError from "../errors/DataAccessError.js";
 
 function toUserDto(user) {
-  return {
-    username: user.username,
-  };
+  const {hashedPassword, ...userDto} = user;
+  return userDto;
 }
 
 export const signUp = async (req, res) => {

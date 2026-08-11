@@ -32,6 +32,7 @@ export async function fetchUserById(userId) {
   try {
     user = await prisma.user.findUnique({
       where: { id: userId },
+      include: { shortUrls: true },
     });
 
   } catch (error) {
