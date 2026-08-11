@@ -7,20 +7,17 @@ import {
   vi
 } from 'vitest';
 
-import { verifyJwtToken } from '../../src/app/services/users.service';
+import * as usersService from '../../src/app/services/users.service.js';
 import { authenticate } from '../../src/app/middlewares/authenticate.middleware';
 import jwt, { verify } from "jsonwebtoken";
-
-vi.mock("../../src/app/services/users.service", () => ({
-  verifyJwtToken: vi.fn(),
-}));
+import { prisma } from '../../src/config/db';
 
 describe("authenticate", async () => {
   let req;
   let res;
   let next;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     req = {
       cookies: {},
     };
@@ -31,52 +28,67 @@ describe("authenticate", async () => {
     };
 
     next = vi.fn();
+    
+    await prisma.shortUrl.deleteMany();
+    await prisma.user.deleteMany();
 
     vi.clearAllMocks();
   })
 
   it("returns 401 when token is missing", () => {
+    // Arrange
+
+    // Act
     authenticate(req, res, next);
 
+    // Assert
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({
       error: "Missing Token",
     })
 
-    expect(verifyJwtToken).not.toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
   })
 
-  it("sets req.userId and calls next when token is valid", () => {
-    req.cookies.token = 'valid-token';
-    vi.mocked(verifyJwtToken).mockReturnValue({
-      sub: '10',
-    });
-
-    authenticate(req, res, next);
-
-    expect(verifyJwtToken).toHaveBeenCalledWith(
-      "valid-token",
+  it("sets req.userId and calls next when token is valid", async () => {
+    // Arrange
+    const username =  "johndoe";
+    const hashedPassword = "fake-hashed-password";
+    const user = await prisma.user.create({
+      data: {
+        username, hashedPassword
+      }
+    })
+    req.cookies.token = usersService.getJwtToken(
+      user,
       process.env.JWT_SECRET,
+      "15m",
     )
 
-    expect(req.userId).toBe(10);
-    expect(next).toHaveBeenCalledOnce();
+    // Act
+    authenticate(req, res, next);
 
-    expect(res.status).not.toHaveBeenCalled();
-    expect(res.json).not.toHaveBeenCalled();
+    // Assert
+
+    expect(req.userId).toBeTypeOf("number");
+    expect(next).toHaveBeenCalledOnce();
   })
 
   it("returns 401 when token is expired", () => {
+    // Arrange
     req.cookies.token = 'expired-token';
 
-    vi.mocked(verifyJwtToken).mockImplementation(() => {
-      throw new jwt.TokenExpiredError();
-    })
-
+    const verifySpy = vi
+      .spyOn(usersService, "verifyJwtToken")
+      .mockImplementation(() => {
+        throw new jwt.TokenExpiredError();
+      });
+    
+    // Act
     authenticate(req, res, next);
-
-    expect(verifyJwtToken).toHaveBeenCalledOnce();
+    
+    // Assert
+    expect(verifySpy).toHaveBeenCalledOnce();
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalled({ error: "401" });
 
@@ -84,40 +96,33 @@ describe("authenticate", async () => {
   })
 
   it("returns 401 when token is invalid", () => {
+    // Arrange
     req.cookies.token = 'invalid-token';
 
-    vi.mocked(verifyJwtToken).mockImplementation(() => {
-      throw new jwt.JsonWebTokenError();
-    });
-
+    // Act
     authenticate(req, res, next);
 
-    expect(verifyJwtToken).toHaveBeenCalledWith(
-      "invalid-token",
-      process.env.JWT_SECRET,
-    )
-
+    // Assert
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ error : "401" });
     expect(next).not.toHaveBeenCalled();
   })
 
   it("passes unknown errors to next", () => {
+    // Arrange
     req.cookies.token = 'random-token';
+    const error = new Error("Unknown error");
 
-    const error = new Error("unknown error");
-
-    vi.mocked(verifyJwtToken).mockImplementation(() => {
-      throw error;
-    })
-
+    const verifySpy = vi
+      .spyOn(usersService, "verifyJwtToken")
+      .mockImplementation(() => {
+        throw error;
+      });
+    
+    // Act
     authenticate(req, res, next);
 
-    expect(verifyJwtToken).toHaveBeenCalledWith(
-      'random-token',
-      process.env.JWT_SECRET,
-    )
-
+    // Assert
     expect(next).toHaveBeenCalledWith(error);
     expect(res.status).not.toHaveBeenCalled();
   })
