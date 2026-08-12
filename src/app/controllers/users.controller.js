@@ -13,13 +13,27 @@ function toUserDto(user) {
 }
 
 export const signUp = async (req, res) => {
+  if (!req.body.username || !req.body.password)
+    return res.status(400).json({ error: "Bad request" });
   const user = await createUser(req.body.username, req.body.password);
   const formattedUser = toUserDto(user);
   return res.status(201).json(formattedUser);
 };
 
 export const signIn = async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  if (!username || !password)
+    return res.status(400).json({ error: "Bad request" });
+  
+  if (username instanceof String && username.trim() === "")
+    return res.status(400).json({ error: "Bad request" });
+
+  if (password instanceof String && password.trim() === "")
+    return res.status(400).json({ error: "Bad request" });
+
   const user = await getUserByUsername(req.body.username);
+  
   if (!user || ! await verifyPassword(req.body.password, user.hashedPassword)) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
