@@ -1,5 +1,6 @@
 import * as shortenService from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
+import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 function toShortUrlDto(shortUrl) {
   const { id, is_deleted, ...leftover } = shortUrl;
@@ -17,7 +18,6 @@ export const redirectToOriginalUrl = async (req, res) => {
   */
 
   const originalUrl = await shortenService.getOriginalUrlByCode(code);
-  if (!originalUrl) return res.status(400).json({ error: "URL not found" });
 
   return res.set("Cache-Control", "max-age=60").redirect(originalUrl);
 };
@@ -27,14 +27,15 @@ export const createShortUrl = async (req, res) => {
   const userId = req.userId;
 
   if (!originalUrl)
-    return res.status(400).json({ error: "URL is required " });
+    throw createAppError(Errors.URL_REQUIRED);
 
-  if (originalUrl instanceof String && originalUrl.trim() === "")
-    return res.status(400).json({ error: "URL is required " });
+  if (!originalUrl instanceof String)
+    throw createAppError(Errors.URL_REQUIRED);
+
+  if (originalUrl.trim() === "")
+    throw createAppError(Errors.URL_REQUIRED);
 
   const code = await shortenService.shortenUrl(originalUrl, userId);
-  if (code === null) 
-    return res.status(400).json({ error: "Invalid URL" });
 
   const shortUrl = `${req.protocol}://${req.get("host")}/shortened/${code}`;
   return res.json({ shortUrl });

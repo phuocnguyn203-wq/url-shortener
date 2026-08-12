@@ -6,6 +6,7 @@ import {
   verifyPassword,
 } from "../services/users.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
+import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 function toUserDto(user) {
   const {hashedPassword, ...userDto} = user;
@@ -13,9 +14,12 @@ function toUserDto(user) {
 }
 
 export const signUp = async (req, res) => {
-  if (!req.body.username || !req.body.password)
-    return res.status(400).json({ error: "Bad request" });
-  const user = await createUser(req.body.username, req.body.password);
+  const username = req.body.username;
+  const password = req.body.password;
+  if (!username || !password)
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
+  
+  const user = await createUser(username, password);
   const formattedUser = toUserDto(user);
   return res.status(201).json(formattedUser);
 };
@@ -24,18 +28,21 @@ export const signIn = async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   if (!username || !password)
-    return res.status(400).json({ error: "Bad request" });
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
   
-  if (username instanceof String && username.trim() === "")
-    return res.status(400).json({ error: "Bad request" });
+  if (!username instanceof String || !password instanceof String)
+    return createAppError(Errors.INVALID_CREDENTIALS_INPUT);
 
-  if (password instanceof String && password.trim() === "")
-    return res.status(400).json({ error: "Bad request" });
+  if (username.trim() === "")
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
+
+  if (password.trim() === "")
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
 
   const user = await getUserByUsername(req.body.username);
   
   if (!user || ! await verifyPassword(req.body.password, user.hashedPassword)) {
-    return res.status(401).json({ error: "Invalid credentials" });
+    throw createAppError(Errors.INVALID_CREDENTIALS);
   }
 
   const jwtToken = getJwtToken(user, process.env.JWT_SECRET, "15m");
