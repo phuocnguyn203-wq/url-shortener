@@ -1,4 +1,5 @@
 import * as shortenerRepo from '../repositories/shortener.repository.js';
+import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 export function encodeBase62(num) {
   const ALPHABET =
@@ -30,7 +31,7 @@ export async function shortenUrl(originalUrl, userId) {
   const url = URL.parse(originalUrl);
 
   if (!url || !["http:", "https:"].includes(url.protocol))
-    return null;
+    throw createAppError(Errors.INVALID_URL)
 
   const shortenedUrl = await shortenerRepo.createShortUrl(originalUrl, userId);
   const code = encodeBase62(shortenedUrl.id);
@@ -43,16 +44,17 @@ export async function getOriginalUrlByCode(code) {
   const urlId = decodeBase62(code);
   const shortUrl = await shortenerRepo.findShortUrlById(urlId);
 
-  if (!shortUrl) return null;
+  if (!shortUrl)
+    throw createAppError(Errors.SHORT_URL_NOT_FOUND);
 
   return shortUrl.originalUrl;
 }
 
 export async function softDeleteUrl(code, userId) {
   const urlId = decodeBase62(code);
-  const url = await shortenerRepo.softDeleteShortUrlById(urlId, userId);
+  const is_deleted = await shortenerRepo.softDeleteShortUrlById(urlId, userId);
 
-  return url;
+  return is_deleted;
 }
 
 export async function getAllMyShortUrls(userId, isDeleted=false) {
