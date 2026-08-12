@@ -26,7 +26,10 @@ export const createShortUrl = async (req, res) => {
   const { originalUrl } = req.body;
   const userId = req.userId;
 
-  if (!originalUrl || originalUrl.trim() === "")
+  if (!originalUrl)
+    return res.status(400).json({ error: "URL is required " });
+
+  if (originalUrl instanceof String && originalUrl.trim() === "")
     return res.status(400).json({ error: "URL is required " });
 
   const code = await shortenService.shortenUrl(originalUrl, userId);
