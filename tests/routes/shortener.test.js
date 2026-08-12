@@ -11,10 +11,10 @@ import { prisma } from "../../src/config/db.js";
 import { getJwtToken } from "../../src/app/services/users.service.js";
 import { encodeBase62 } from "../../src/app/services/shortener.service.js";
 //create a new user before each test
-async function createNewUser() {
+async function createNewUser(username="johndoe") {
   const user = await prisma.user.create({
     data: {
-      username: "johndoe",
+      username: username,
       hashedPassword: "fake-hashed-password",
     }
   });
@@ -174,6 +174,31 @@ describe("DELETE /shortened", async () => {
       }
     });
     expect(deletedShortUrl).not.toBeNull();
+  });
+
+  it("returns 404 when user A tries to delete url of user B", async () => {
+    // Arrange
+    const { user: userA, token: tokenA } = await createNewUser("UserA");
+    const { user: userB, token: tokenB } = await createNewUser("UserB");
+    const shortUrl = await prisma.shortUrl.create({
+      data: { originalUrl: "https://netflix.com", userId: userB.id }
+    })
+    const code = encodeBase62(shortUrl.id);
+    
+    // Act
+    const response = await request(app)
+      .delete(`/shortened/${code}`)
+      .set("Cookie", `token=${tokenA}`);
+    
+    // Assert
+    expect(response.status).toBe(404);
+
+    // Assert side effect
+    const userBShortUrl = await prisma.shortUrl.findUnique({
+      where: { id: shortUrl.id },
+    });
+    expect(userBShortUrl.is_deleted).toBe(false);
+
   })
 });
 
