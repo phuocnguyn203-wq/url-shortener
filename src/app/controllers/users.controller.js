@@ -30,8 +30,8 @@ export const signIn = async (req, res) => {
   if (!username || !password)
     throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
   
-  if (!username instanceof String || !password instanceof String)
-    return createAppError(Errors.INVALID_CREDENTIALS_INPUT);
+  if (typeof username !== "string" || typeof password !== "string")
+    throw createAppError(Errors.INVALID_CREDENTIALS_INPUT);
 
   if (username.trim() === "")
     throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);

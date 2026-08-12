@@ -41,7 +41,7 @@ describe("POST /users/create", () => {
     expect(user).not.toBeNull();
   });
 
-  it("returns 400 for duplicated username ib db", async () => {
+  it("returns 409 for duplicated username ib db", async () => {
     // Arrange
     const user = await prisma.user.create({
       data: {
@@ -61,7 +61,7 @@ describe("POST /users/create", () => {
         password: password,
       });
     
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(409);
     
     // Assert side effect
     const nonExistUser = await prisma.user.findMany({

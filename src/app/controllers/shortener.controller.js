@@ -29,8 +29,8 @@ export const createShortUrl = async (req, res) => {
   if (!originalUrl)
     throw createAppError(Errors.URL_REQUIRED);
 
-  if (!originalUrl instanceof String)
-    throw createAppError(Errors.URL_REQUIRED);
+  if (typeof originalUrl !== "string")
+    throw createAppError(Errors.INVALID_URL);
 
   if (originalUrl.trim() === "")
     throw createAppError(Errors.URL_REQUIRED);

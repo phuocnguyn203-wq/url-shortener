@@ -13,7 +13,7 @@ export async function insertUserToDb(username, hashedPassword) {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError 
       && error.code === "P2002") {
-      throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
+      throw createAppError(Errors.USERNAME_ALREADY_EXISTS);
     } 
     throw new DataAccessError(
       "Failed to create user", 
