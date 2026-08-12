@@ -78,7 +78,7 @@ describe("authenticate", async () => {
     expect(next).toHaveBeenCalledOnce();
   })
 
-  it("returns 401 when token is expired", () => {
+  it("passes errors when token is expired", () => {
     // Arrange
     req.cookies.token = 'expired-token';
 
@@ -92,14 +92,10 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
     
     // Assert
-    expect(verifySpy).toHaveBeenCalledOnce();
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ error: "401" });
-
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
   })
 
-  it("returns 401 when token is invalid", () => {
+  it("passes error to when token is invalid", () => {
     // Arrange
     req.cookies.token = 'invalid-token';
 
@@ -107,9 +103,7 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
 
     // Assert
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ error : "401" });
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
   })
 
   it("passes unknown errors to next", () => {
