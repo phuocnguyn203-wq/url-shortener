@@ -52,9 +52,12 @@ export async function getOriginalUrlByCode(code) {
 
 export async function softDeleteUrl(code, userId) {
   const urlId = decodeBase62(code);
-  const is_deleted = await shortenerRepo.softDeleteShortUrlById(urlId, userId);
+  const is_delete_success = await shortenerRepo.softDeleteShortUrlById(urlId, userId);
 
-  return is_deleted;
+  if (!is_delete_success)
+    throw createAppError(Errors.SHORT_URL_NOT_FOUND);
+
+  return is_delete_success;
 }
 
 export async function getAllMyShortUrls(userId, isDeleted=false) {
