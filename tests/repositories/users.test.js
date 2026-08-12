@@ -51,14 +51,14 @@ describe("fetchUserById", async () => {
 		expect(result.username).toBe(user.username);
 	})
 
-	it("throws error when given non-exist id", async () => {
+	it("returns null when given non-exist id", async () => {
 		// Arrange
 		const nonExistId = 99999;
 
 		// Act, Assert
 		await expect(fetchUserById(nonExistId))
-			.rejects
-			.toBeInstanceOf(AppError);
+			.resolves
+			.toBeNull();
 	})
 });
 
@@ -74,11 +74,11 @@ describe("fetchUserByUsername", () => {
 		expect(result).toEqual(user);
 	})
 
-	it("raises error when given username that doesn't exist", async () => {
+	it("returns null when given username that doesn't exist", async () => {
 		// Arrange, Act, Assert
 		await expect(fetchUserByUsername("It doesn't exist"))
-			.rejects
-			.toBeInstanceOf(AppError);
+			.resolves
+			.toBeNull();
 	})
 })
 
