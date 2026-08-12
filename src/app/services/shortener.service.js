@@ -27,13 +27,14 @@ export function decodeBase62(code) {
 export async function shortenUrl(originalUrl, userId) {
   //insert url to db, convert its id in db to base62
   //return shortened url
-  if (URL.canParse(originalUrl)) {
-    const shortenedUrl = await shortenerRepo.createShortUrl(originalUrl, userId);
-    const code = encodeBase62(shortenedUrl.id);
-    return code;
-  }
+  const url = URL.parse(originalUrl);
 
-  return null;
+  if (!url || !["http:", "https:"].includes(url.protocol))
+    return null;
+
+  const shortenedUrl = await shortenerRepo.createShortUrl(originalUrl, userId);
+  const code = encodeBase62(shortenedUrl.id);
+  return code;
 }
 
 export async function getOriginalUrlByCode(code) {
