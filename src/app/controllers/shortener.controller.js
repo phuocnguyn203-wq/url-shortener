@@ -2,15 +2,10 @@ import * as shortenService from "../services/shortener.service.js";
 import DataAccessError from "../errors/DataAccessError.js";
 
 function toShortUrlDto(shortUrl) {
-  const code = shortenService.encodeBase62(shortUrl.id);
-  const updatedAt = shortUrl.updatedAt;
-  const originalUrl = shortUrl.originalUrl;
+  const { id, is_deleted, ...leftover } = shortUrl;
+  const code = shortenService.encodeBase62(id);
 
-  return {
-    code,
-    updatedAt,
-    originalUrl,
-  };
+  return { code, ...leftover };
 }
 
 export const redirectToOriginalUrl = async (req, res) => {

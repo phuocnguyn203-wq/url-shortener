@@ -136,7 +136,8 @@ describe("GET /shortened", () => {
     expect(response.body.length).toBe(4);
     const expectArray = shortUrls.map((shortUrl) => {
       return expect.objectContaining({ 
-        originalUrl: shortUrl.originalUrl 
+        originalUrl: shortUrl.originalUrl,
+        userId: shortUrl.userId,
       });
     });
     expect(response.body).toEqual(
