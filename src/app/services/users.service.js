@@ -6,6 +6,8 @@ import {
   fetchUserByUsername,
 } from "../repositories/users.repository.js";
 
+import { Errors, createAppError } from "../errors/errorDefinitions.js";
+
 export async function verifyPassword(plainPassword, hashedPassword) {
   return await bcrypt.compare(plainPassword, hashedPassword);
 }
@@ -16,11 +18,18 @@ export async function createUser(username, plainPassword) {
 }
 
 export async function getUserById(userId) {
+  const user = await fetchUserById(userId);
+  if (!user)
+    throw createAppError(Errors.USER_NOT_FOUND);
   return await fetchUserById(userId);
 }
 
 export async function getUserByUsername(username) {
-  return await fetchUserByUsername(username);
+  const user = await fetchUserByUsername(username);
+  if (!user)
+    throw createAppError(Errors.INVALID_CREDENTIALS);
+  
+  return user;
 }
 
 export function getJwtToken(user, jwtSecret, expireMin) {

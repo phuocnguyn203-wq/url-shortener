@@ -41,9 +41,8 @@ export const signIn = async (req, res) => {
 
   const user = await getUserByUsername(req.body.username);
   
-  if (!user || ! await verifyPassword(req.body.password, user.hashedPassword)) {
+  if (! await verifyPassword(req.body.password, user.hashedPassword))
     throw createAppError(Errors.INVALID_CREDENTIALS);
-  }
 
   const jwtToken = getJwtToken(user, process.env.JWT_SECRET, "15m");
 
