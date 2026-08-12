@@ -75,7 +75,7 @@ describe("POST /shortened", () => {
     
     // Assert
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe("Invalid URL");
+    expect(response.body.error).toBe("INVALID_URL");
 
     // Assert side effects
     const notExistShortUrl = await prisma.shortUrl.findFirst({
@@ -99,7 +99,7 @@ describe("POST /shortened", () => {
     
     // Assert
     expect(response.status).toBe(400);
-    expect(response.body.error.trim()).toBe("URL is required");
+    expect(response.body.error.trim()).toBe("URL_REQUIRED");
     // Assert side effect
     const notExistShortUrl = await prisma.shortUrl.findFirst({
       where: {
