@@ -1,5 +1,6 @@
 import { verifyJwtToken } from "../services/users.service.js";
 import jwt from "jsonwebtoken";
+import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 export function authenticate(req, res, next) {
   const jwtToken = req.cookies.token;
@@ -22,7 +23,7 @@ export function authenticate(req, res, next) {
       error instanceof jwt.JsonWebTokenError
     )
       // 401 means can't not authenticate
-      return res.status(401).json({ error: "401" });
+      next(createAppError(Errors.INVALID_TOKEN))
     
     return next(error);
   }

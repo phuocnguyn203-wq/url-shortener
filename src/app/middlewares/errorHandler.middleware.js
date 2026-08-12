@@ -17,6 +17,7 @@ export default function errorHandler(err, req, res, next) {
   console.log(err.cause ?? err);
   return res.status(500).json({
     error: "INTERNAL_SERVER_ERROR",
+    message: "Something's wrong please wait"
   });
 
 }
