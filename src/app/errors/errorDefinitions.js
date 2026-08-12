@@ -36,6 +36,12 @@ export const Errors = {
     message: "Authentication token is invalid",
   },
 
+  USER_NOT_FOUND: {
+    statusCode: 404,
+    code: "USER_NOT_FOUND",
+    message: "User was not found",
+  },
+
   SHORT_URL_NOT_FOUND: {
     statusCode: 404,
     code: "SHORT_URL_NOT_FOUND",
