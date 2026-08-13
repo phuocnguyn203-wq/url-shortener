@@ -15,7 +15,6 @@ import {
     getAllShortUrlsByUserId,   
 } from "../../src/app/repositories/shortener.repository.js";
 
-import DataAccessError from "../../src/app/errors/DataAccessError.js";
 import AppError from "../../src/app/errors/AppError.js";
 
 beforeEach(async() => {

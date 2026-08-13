@@ -12,10 +12,6 @@ import {
 	insertUserToDb
 } from "../../src/app/repositories/users.repository.js";
 
-import {
-	DataAccessError
-} from "../../src/app/errors/DataAccessError.js";
-
 import { prisma } from "../../src/config/db.js";
 import AppError from "../../src/app/errors/AppError.js";
 

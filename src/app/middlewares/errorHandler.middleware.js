@@ -1,9 +1,12 @@
-import DataAccessError from "../errors/DataAccessError.js";
+import { DataAccessError } from "../errors/DataAccessError.js";
 import AppError from "../errors/AppError.js";
 export default function errorHandler(err, req, res, next) {
   if (err instanceof DataAccessError) {
     console.error(err.cause ?? err);
-    return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+    return res.status(500).json({ 
+      error: "INTERNAL_SERVER_ERROR",
+      message: "Something's wrong, please wait"
+    });
 
   }
   if (err instanceof AppError) {

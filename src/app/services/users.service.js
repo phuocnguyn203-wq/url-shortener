@@ -21,14 +21,13 @@ export async function getUserById(userId) {
   const user = await fetchUserById(userId);
   if (!user)
     throw createAppError(Errors.USER_NOT_FOUND);
-  return await fetchUserById(userId);
+  return user;
 }
 
 export async function getUserByUsername(username) {
   const user = await fetchUserByUsername(username);
   if (!user)
     throw createAppError(Errors.INVALID_CREDENTIALS);
-  
   return user;
 }
 

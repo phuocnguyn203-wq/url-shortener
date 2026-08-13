@@ -1,6 +1,6 @@
 import { prisma } from "../../config/db.js";
 import { Prisma } from "../../../generated/prisma/client.ts";
-import DataAccessError from "../errors/DataAccessError.js";
+import  { DataAccessError, createDataAccessError } from "../errors/DataAccessError.js";
 import { Errors, createAppError } from "../errors/errorDefinitions.js";
 export async function insertUserToDb(username, hashedPassword) {
   try {
@@ -15,10 +15,7 @@ export async function insertUserToDb(username, hashedPassword) {
       && error.code === "P2002") {
       throw createAppError(Errors.USERNAME_ALREADY_EXISTS);
     } 
-    throw new DataAccessError(
-      "Failed to create user", 
-      { cause: error }
-    );
+    throw createDataAccessError("Failed to create user", { cause: error });
   }
 }
 
@@ -31,10 +28,7 @@ export async function fetchUserById(userId) {
     });
 
   } catch (error) {
-    throw new DataAccessError(
-      "Failed to fetch user", 
-      { cause: error }
-    );
+    throw createDataAccessError("Failed to fetch user", { cause: error });
   }
 
   return user;
@@ -48,10 +42,7 @@ export async function fetchUserByUsername(username) {
     });
 
   } catch (error) {
-    throw new DataAccessError(
-      "Failed to fetch user", 
-      { cause: error }
-    );
+    throw createDataAccessError("Failed to fetch user", { cause: error });
   }
 
   return user;

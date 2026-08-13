@@ -46,12 +46,7 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
 
     // Assert
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({
-      error: "Missing Token",
-    })
-
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledOnce();
   })
 
   it("sets req.userId and calls next when token is valid", async () => {
@@ -92,7 +87,7 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
     
     // Assert
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledOnce();
   })
 
   it("passes error to when token is invalid", () => {
@@ -103,7 +98,7 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
 
     // Assert
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledOnce();
   })
 
   it("passes unknown errors to next", () => {
@@ -121,6 +116,7 @@ describe("authenticate", async () => {
     authenticate(req, res, next);
 
     // Assert
+    expect(next).toHaveBeenCalledOnce();
     expect(next).toHaveBeenCalledWith(error);
     expect(res.status).not.toHaveBeenCalled();
   })

@@ -1,5 +1,4 @@
 import * as shortenService from "../services/shortener.service.js";
-import DataAccessError from "../errors/DataAccessError.js";
 import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 function toShortUrlDto(shortUrl) {

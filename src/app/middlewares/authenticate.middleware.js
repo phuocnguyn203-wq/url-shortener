@@ -5,7 +5,7 @@ import { Errors, createAppError } from "../errors/errorDefinitions.js";
 export function authenticate(req, res, next) {
   const jwtToken = req.cookies.token;
   if (!jwtToken) {
-    return res.status(401).json({ error: "Missing Token" });
+    return next(createAppError(Errors.MISSING_TOKEN));
   }
   /*
   Handle error here, because not like DataAccessError,
@@ -23,7 +23,7 @@ export function authenticate(req, res, next) {
       error instanceof jwt.JsonWebTokenError
     )
       // 401 means can't not authenticate
-      next(createAppError(Errors.INVALID_TOKEN))
+      return next(createAppError(Errors.INVALID_TOKEN))
     
     return next(error);
   }

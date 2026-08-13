@@ -5,7 +5,6 @@ import {
   getUserById,
   verifyPassword,
 } from "../services/users.service.js";
-import DataAccessError from "../errors/DataAccessError.js";
 import { Errors, createAppError } from "../errors/errorDefinitions.js";
 
 function toUserDto(user) {
@@ -18,6 +17,9 @@ export const signUp = async (req, res) => {
   const password = req.body.password;
   if (!username || !password)
     throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
+
+  if (typeof username !== "string" || typeof password !== "string")
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT)
   
   const user = await createUser(username, password);
   const formattedUser = toUserDto(user);
@@ -31,7 +33,7 @@ export const signIn = async (req, res) => {
     throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
   
   if (typeof username !== "string" || typeof password !== "string")
-    throw createAppError(Errors.INVALID_CREDENTIALS_INPUT);
+    throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
 
   if (username.trim() === "")
     throw createAppError(Errors.INVALID_CREDENTIAL_INPUT);
